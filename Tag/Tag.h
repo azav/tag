@@ -65,10 +65,10 @@ typedef NS_ENUM(int, SearchScope) {
 @property (assign, nonatomic) BOOL recurseDirectories;  // Enter/enumerate directories
 @property (assign, nonatomic) BOOL enterDirectories;    // Recursively process any directory we encounter
 
-@property (copy, nonatomic) NSSet* tags;
-@property (copy, nonatomic) NSArray* URLs;
+@property (copy, nonatomic) NSSet *tags;
+@property (copy, nonatomic) NSArray *URLs;
 
-@property (copy, nonatomic) NSDictionary* tagColors;
+@property (copy, nonatomic) NSDictionary *tagColors;
 
 - (void)parseCommandLineArgv:(char * const *)argv argc:(int)argc;
 - (void)performOperation;

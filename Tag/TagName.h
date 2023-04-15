@@ -34,11 +34,11 @@
 
 @interface TagName : NSObject<NSCopying>
 
-- (instancetype)initWithTag:(NSString*)tag;
+- (instancetype)initWithTag:(NSString *)tag;
 
-@property (readonly) NSString* visibleName;
-@property (readonly) NSString* comparableName;
+@property (readonly) NSString *visibleName;
+@property (readonly) NSString *comparableName;
 
-- (BOOL)isEqualToTagName:(TagName*)tagName;
+- (BOOL)isEqualToTagName:(TagName *)tagName;
 
 @end

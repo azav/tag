@@ -52,10 +52,10 @@
 #import "TagName.h"
 #import <getopt.h>
 
-NSString* const version = @"0.10.0";
+NSString * const version = @"0.10.0";
 
 // This constant doesn't seem to be defined in MDItem.h, so we define it here
-NSString* const kMDItemUserTags = @"kMDItemUserTags";
+NSString * const kMDItemUserTags = @"kMDItemUserTags";
 
 
 @interface Tag ()
@@ -65,11 +65,11 @@ NSString* const kMDItemUserTags = @"kMDItemUserTags";
 @implementation Tag
 
 
-static void FPrintf(FILE* f, NSString* fmt, ...) __attribute__ ((format(__NSString__, 2, 3)));
-static void Printf(NSString* fmt, ...) __attribute__ ((format(__NSString__, 1, 2)));
+static void FPrintf(FILE *f, NSString *fmt, ...) __attribute__ ((format(__NSString__, 2, 3)));
+static void Printf(NSString *fmt, ...) __attribute__ ((format(__NSString__, 1, 2)));
 
 
-static void FPrintf(FILE* f, NSString* fmt, ...)
+static void FPrintf(FILE *f, NSString *fmt, ...)
 {
     va_list ap;
     va_start (ap, fmt);
@@ -79,7 +79,7 @@ static void FPrintf(FILE* f, NSString* fmt, ...)
 }
 
 
-static void Printf(NSString* fmt, ...)
+static void Printf(NSString *fmt, ...)
 {
     va_list ap;
     va_start (ap, fmt);
@@ -310,16 +310,16 @@ typedef NS_ENUM(int, CommandCode) {
 
 - (void)parseFilenameArguments:(char * const *)argv argc:(int)argc
 {
-    NSMutableArray* URLs = [NSMutableArray new];
+    NSMutableArray *URLs = [NSMutableArray new];
     for (int arg = 0; arg < argc; ++arg)
     {
         // Get the path, ignoring empty paths
-        NSString* path = [NSString stringWithUTF8String:argv[arg]];
+        NSString *path = [NSString stringWithUTF8String:argv[arg]];
         if (![path length])
             continue;
         
         // Add the URL to our array of URLs to process
-        NSURL* URL = [NSURL fileURLWithPath:path];
+        NSURL *URL = [NSURL fileURLWithPath:path];
         if (!URL)
         {
             FPrintf(stderr, @"%@: Can't form a URL from path %@\n", [self programName], path);
@@ -331,16 +331,16 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (void)parseTagsArgument:(NSString*)arg
+- (void)parseTagsArgument:(NSString *)arg
 {
     // The tags arg is a comma-separated list of tags
-    NSArray* components = [arg componentsSeparatedByString:@","];
+    NSArray *components = [arg componentsSeparatedByString:@","];
     
     // Form the unique set of tags
-    NSMutableSet* uniqueTags = [NSMutableSet new];
-    for (NSString* component in components)
+    NSMutableSet *uniqueTags = [NSMutableSet new];
+    for (NSString *component in components)
     {
-        NSString* trimmed = [component stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSString *trimmed = [component stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         if ([trimmed length])
             [uniqueTags addObject:[[TagName alloc] initWithTag:trimmed]];
     }
@@ -349,7 +349,7 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (NSString*)programName
+- (NSString *)programName
 {
     return [NSProcessInfo processInfo].processName;
 }
@@ -407,19 +407,19 @@ typedef NS_ENUM(int, CommandCode) {
 #define COLORS_ORANGE    COLORS_ESCAPE @"48;5;208m"
 
 
-- (NSDictionary*)getTagColors
+- (NSDictionary *)getTagColors
 {
     // Get the tag colors
     //
     // Since this is using private finder data structures, it may not always continue to work.
     // We make a best effort attempt and try to bail if we don't find what we expect to find there
     
-    NSError* error;
-    NSString* homeDir = NSHomeDirectory();
-    NSString* finderPlistPath = [homeDir stringByAppendingString: @"/Library/SyncedPreferences/com.apple.finder.plist"];
-    NSURL* url = [NSURL fileURLWithPath:finderPlistPath];
+    NSError *error;
+    NSString *homeDir = NSHomeDirectory();
+    NSString *finderPlistPath = [homeDir stringByAppendingString: @"/Library/SyncedPreferences/com.apple.finder.plist"];
+    NSURL *url = [NSURL fileURLWithPath:finderPlistPath];
     
-    NSData* data = [NSData dataWithContentsOfURL:url];
+    NSData *data = [NSData dataWithContentsOfURL:url];
     if (!data)
         return nil;
 
@@ -427,7 +427,7 @@ typedef NS_ENUM(int, CommandCode) {
     if (!properties)
         return nil;
     
-    NSArray* tagsArray = [properties valueForKeyPath:@"values.FinderTagDict.value.FinderTags"];
+    NSArray *tagsArray = [properties valueForKeyPath:@"values.FinderTagDict.value.FinderTags"];
     if (![tagsArray isKindOfClass:[NSArray class]])
         return nil;
     
@@ -435,17 +435,17 @@ typedef NS_ENUM(int, CommandCode) {
     NSUInteger tagCount = [tagsArray count];
     NSMutableDictionary *colors = [NSMutableDictionary dictionaryWithCapacity:tagCount];
     
-    for (NSDictionary* tagEntry in tagsArray)
+    for (NSDictionary *tagEntry in tagsArray)
     {
         if (![tagEntry isKindOfClass:[NSDictionary class]])
             return nil;
         
-        NSString* tag = tagEntry[@"n"];
-        NSNumber* colorCode = tagEntry[@"l"];
+        NSString *tag = tagEntry[@"n"];
+        NSNumber *colorCode = tagEntry[@"l"];
         if (tag == nil || colorCode == nil)
             continue;
         
-        NSString* colorSequence = nil;
+        NSString *colorSequence = nil;
         switch ([colorCode intValue])
         {
             case 1:
@@ -518,14 +518,14 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (void)reportFatalError:(NSError*)error onURL:(NSURL*)URL
+- (void)reportFatalError:(NSError *)error onURL:(NSURL *)URL
 {
     FPrintf(stderr, @"%@: %@\n", [self programName], error.localizedDescription);
     exit(2);
 }
 
 
-- (NSString*)string:(NSString*)s paddedToMinimumLength:(int)minLength
+- (NSString *)string:(NSString *)s paddedToMinimumLength:(int)minLength
 {
     NSInteger length = [s length];
     if (length >= minLength)
@@ -535,10 +535,10 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (NSString*)displayStringForTag:(NSString*)tag
+- (NSString *)displayStringForTag:(NSString *)tag
 {
-    NSString* result = nil;
-    NSString* colorSequence = (self.tagColors != nil) ? _tagColors[[[TagName alloc] initWithTag:tag]] : nil;
+    NSString *result = nil;
+    NSString *colorSequence = (self.tagColors != nil) ? _tagColors[[[TagName alloc] initWithTag:tag]] : nil;
     if (colorSequence != nil)
         result = [NSString stringWithFormat:@"%@%@%@", colorSequence, tag, COLORS_NONE];
     else
@@ -547,15 +547,15 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (void)emitURL:(NSURL*)URL tags:(NSArray*)tagArray
+- (void)emitURL:(NSURL *)URL tags:(NSArray *)tagArray
 {
-    NSString* fileName = nil;
+    NSString *fileName = nil;
     if (_outputFlags & OutputFlagsName)
     {
-        NSString* suffix = @"";
+        NSString *suffix = @"";
         if (_outputFlags & OutputFlagsSlashDirectory)
         {
-            NSNumber* isDir = nil;
+            NSNumber *isDir = nil;
             [URL getResourceValue:&isDir forKey:NSURLIsDirectoryKey error:nil];
             if ([isDir boolValue])
                 suffix = @"/";
@@ -570,17 +570,17 @@ typedef NS_ENUM(int, CommandCode) {
     if (fileName)
     {
         BOOL padFileField = printTags && !tagsOnSeparateLines;
-        NSString* fileField = padFileField ? [self string:fileName paddedToMinimumLength:31] : fileName;
+        NSString *fileField = padFileField ? [self string:fileName paddedToMinimumLength:31] : fileName;
         Printf(@"%@", fileField);
     }
     
     if (printTags)
     {
         BOOL needLineTerm = NO;
-        NSArray* sortedTags = [tagArray sortedArrayUsingSelector:@selector(compare:)];
+        NSArray *sortedTags = [tagArray sortedArrayUsingSelector:@selector(compare:)];
     
-        NSString* tagSeparator;
-        NSString* startingSeparator;
+        NSString *tagSeparator;
+        NSString *startingSeparator;
         if (tagsOnSeparateLines)
         {
             needLineTerm = !!fileName;
@@ -593,8 +593,8 @@ typedef NS_ENUM(int, CommandCode) {
             startingSeparator = fileName ? @"\t" : @"";
         }
         
-        NSString* sep = startingSeparator;
-        for (NSString* tag in sortedTags)
+        NSString *sep = startingSeparator;
+        for (NSString *tag in sortedTags)
         {
             if (needLineTerm)
                 putc(lineTerminator, stdout);
@@ -611,34 +611,34 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (BOOL)wildcardInTagSet:(NSSet*)set
+- (BOOL)wildcardInTagSet:(NSSet *)set
 {
-    TagName* wildcard = [[TagName alloc] initWithTag:@"*"];
+    TagName *wildcard = [[TagName alloc] initWithTag:@"*"];
     return [set containsObject:wildcard];
 }
 
 
-- (NSMutableSet*)tagSetFromTagArray:(NSArray*)tagArray
+- (NSMutableSet *)tagSetFromTagArray:(NSArray*)tagArray
 {
-    NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:[tagArray count]];
-    for (NSString* tag in tagArray)
+    NSMutableSet *set = [[NSMutableSet alloc] initWithCapacity:[tagArray count]];
+    for (NSString *tag in tagArray)
         [set addObject:[[TagName alloc] initWithTag:tag]];
     return set;
 }
 
 
-- (NSArray*)tagArrayFromTagSet:(NSSet*)tagSet
+- (NSArray *)tagArrayFromTagSet:(NSSet *)tagSet
 {
-    NSMutableArray* array = [[NSMutableArray alloc] initWithCapacity:[tagSet count]];
-    for (TagName* tag in tagSet)
+    NSMutableArray *array = [[NSMutableArray alloc] initWithCapacity:[tagSet count]];
+    for (TagName *tag in tagSet)
         [array addObject:tag.visibleName];
     return array;
 }
 
 
-- (void)enumerateDirectory:(NSURL*)directoryURL withBlock:(void (^)(NSURL *URL))block
+- (void)enumerateDirectory:(NSURL *)directoryURL withBlock:(void (^)(NSURL *URL))block
 {
-    NSURL* baseURL = directoryURL;
+    NSURL *baseURL = directoryURL;
     
     NSInteger enumerationOptions = 0;
     if (!_displayAllFiles)
@@ -646,25 +646,25 @@ typedef NS_ENUM(int, CommandCode) {
     if (!_recurseDirectories)
         enumerationOptions |= NSDirectoryEnumerationSkipsSubdirectoryDescendants;
     
-    NSFileManager* fileManager = [NSFileManager defaultManager];
-    NSDirectoryEnumerator* enumerator = [fileManager enumeratorAtURL:baseURL
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:baseURL
                                           includingPropertiesForKeys:@[NSURLTagNamesKey]
                                                              options:enumerationOptions
                                                         errorHandler:nil];
     
-    NSString* baseURLString = [baseURL absoluteString];
-    for (NSObject* obj in enumerator)
+    NSString *baseURLString = [baseURL absoluteString];
+    for (NSObject *obj in enumerator)
     {
         @autoreleasepool {
-            NSURL* fullURL = (NSURL*)obj;
+            NSURL *fullURL = (NSURL *)obj;
             
             // The directory enumerator returns full URLs, not partial URLs, which are what we really want.
             // So remake the URL as a partial URL if possible
-            NSURL* URL = fullURL;
-            NSString* fullURLString = [fullURL absoluteString];
+            NSURL *URL = fullURL;
+            NSString *fullURLString = [fullURL absoluteString];
             if ([fullURLString hasPrefix:baseURLString])
             {
-                NSString* relativePart = [fullURLString substringFromIndex:[baseURLString length]];
+                NSString *relativePart = [fullURLString substringFromIndex:[baseURLString length]];
                 URL = [NSURL URLWithString:relativePart relativeToURL:baseURL];
             }
             
@@ -679,18 +679,18 @@ typedef NS_ENUM(int, CommandCode) {
     if (!block)
         return;
     
-    NSFileManager* fileManager = [NSFileManager defaultManager];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     
     if ([self.URLs count] == 0)
     {
         // No URLs were provided on the command line; enumerate the current directory
-        NSURL* currentDirectoryURL = [NSURL fileURLWithPath:[fileManager currentDirectoryPath]];
+        NSURL *currentDirectoryURL = [NSURL fileURLWithPath:[fileManager currentDirectoryPath]];
         [self enumerateDirectory:currentDirectoryURL withBlock:block];
     }
     else
     {
         // Process URLs provided on the command line
-        for (NSURL* URL in self.URLs)
+        for (NSURL *URL in self.URLs)
         {
             @autoreleasepool {
                 // Invoke the block
@@ -700,7 +700,7 @@ typedef NS_ENUM(int, CommandCode) {
                 // if we have a directory
                 if (_enterDirectories || _recurseDirectories)
                 {
-                    NSNumber* isDir = nil;
+                    NSNumber *isDir = nil;
                     [URL getResourceValue:&isDir forKey:NSURLIsDirectoryKey error:nil];
                     if ([isDir boolValue])
                         [self enumerateDirectory:URL withBlock:block];
@@ -720,9 +720,9 @@ typedef NS_ENUM(int, CommandCode) {
     
     // Enumerate the provided URLs, setting tags on each
     // --all, --enter, and --recursive apply
-    NSArray* tagArray = [self tagArrayFromTagSet:self.tags];
+    NSArray *tagArray = [self tagArrayFromTagSet:self.tags];
     [self enumerateURLsWithBlock:^(NSURL *URL) {
-        NSError* error;
+        NSError *error;
         if (![URL setResourceValue:tagArray forKey:NSURLTagNamesKey error:&error])
             [self reportFatalError:error onURL:URL];
     }];
@@ -743,15 +743,15 @@ typedef NS_ENUM(int, CommandCode) {
     // Enumerate the provided URLs, adding tags to each
     // --all, --enter, and --recursive apply
     [self enumerateURLsWithBlock:^(NSURL *URL) {
-        NSError* error;
+        NSError *error;
         
         // Get the existing tags
-        NSArray* existingTags;
+        NSArray *existingTags;
         if (![URL getResourceValue:&existingTags forKey:NSURLTagNamesKey error:&error])
             [self reportFatalError:error onURL:URL];
         
         // Form the union of the existing tags + new tags.
-        NSMutableSet* tagSet = [self tagSetFromTagArray:existingTags];
+        NSMutableSet *tagSet = [self tagSetFromTagArray:existingTags];
         [tagSet unionSet:self.tags];
         
         // Set all the new tags onto the item
@@ -777,15 +777,15 @@ typedef NS_ENUM(int, CommandCode) {
     // Enumerate the provided URLs, removing tags from each
     // --all, --enter, and --recursive apply
     [self enumerateURLsWithBlock:^(NSURL *URL) {
-        NSError* error;
+        NSError *error;
         
         // Get existing tags from the URL
-        NSArray* existingTags;
+        NSArray *existingTags;
         if (![URL getResourceValue:&existingTags forKey:NSURLTagNamesKey error:&error])
             [self reportFatalError:error onURL:URL];
         
         // Form the revised array of tags
-        NSArray* revisedTags;
+        NSArray *revisedTags;
         if (matchAny)
         {
             // We matched the wildcard, so remove all tags from the item
@@ -794,7 +794,7 @@ typedef NS_ENUM(int, CommandCode) {
         else
         {
             // Existing tags minus tags to remove
-            NSMutableSet* tagSet = [self tagSetFromTagArray:existingTags];
+            NSMutableSet *tagSet = [self tagSetFromTagArray:existingTags];
             [tagSet minusSet:self.tags];
             revisedTags = [self tagArrayFromTagSet:tagSet];
         }
@@ -814,10 +814,10 @@ typedef NS_ENUM(int, CommandCode) {
     // Enumerate the provided URLs or current directory, listing all paths that match the specified tags
     // --all, --enter, and --recursive apply
     [self enumerateURLsWithBlock:^(NSURL *URL) {
-        NSError* error;
+        NSError *error;
         
         // Get the tags on the URL
-        NSArray* tagArray;
+        NSArray *tagArray;
         if (![URL getResourceValue:&tagArray forKey:NSURLTagNamesKey error:&error])
             [self reportFatalError:error onURL:URL];
         NSUInteger tagCount = [tagArray count];
@@ -837,10 +837,10 @@ typedef NS_ENUM(int, CommandCode) {
 {
     // Enumerate the provided URLs or current directory, listing the tags for each path
     // --all, --enter, and --recursive apply
-    [self enumerateURLsWithBlock:^(NSURL* URL) {
+    [self enumerateURLsWithBlock:^(NSURL *URL) {
         // Get the tags
-        NSError* error;
-        NSArray* tagArray;
+        NSError *error;
+        NSArray *tagArray;
         if (![URL getResourceValue:&tagArray forKey:NSURLTagNamesKey error:&error])
             [self reportFatalError:error onURL:URL];
         
@@ -865,30 +865,30 @@ typedef NS_ENUM(int, CommandCode) {
 - (void)findGutsWithUsage:(BOOL)usageMode
 {
     // Start a metadata search for files containing all of the given tags
-    NSMetadataQuery* metadataQuery = [self performMetadataSearchForTags:self.tags usageMode:usageMode];
+    NSMetadataQuery *metadataQuery = [self performMetadataSearchForTags:self.tags usageMode:usageMode];
     
     // Emit the results of the query, either for tags or for usage
     if (usageMode)
     {
         // Print the statistics, ignoring the general query results
-        NSDictionary* valueLists = [metadataQuery valueLists];
-        NSArray* tagTuples = valueLists[kMDItemUserTags];
-        for (NSMetadataQueryAttributeValueTuple* tuple in tagTuples)
+        NSDictionary *valueLists = [metadataQuery valueLists];
+        NSArray *tagTuples = valueLists[kMDItemUserTags];
+        for (NSMetadataQueryAttributeValueTuple *tuple in tagTuples)
         {
-            NSString* tag = (tuple.value == [NSNull null]) ? @"<no_tag>" : tuple.value;
+            NSString *tag = (tuple.value == [NSNull null]) ? @"<no_tag>" : tuple.value;
             Printf(@"%ld\t%@\n", (long)tuple.count, [self displayStringForTag:tag]);
         }
     }
     else
     {
         // Print the query results
-        [metadataQuery enumerateResultsUsingBlock:^(NSMetadataItem* theResult, NSUInteger idx, BOOL * _Nonnull stop) {
+        [metadataQuery enumerateResultsUsingBlock:^(NSMetadataItem *theResult, NSUInteger idx, BOOL * _Nonnull stop) {
             @autoreleasepool {
-                NSString* path = [theResult valueForAttribute:(NSString *)kMDItemPath];
+                NSString *path = [theResult valueForAttribute:(NSString *)kMDItemPath];
                 if (path)
                 {
-                    NSURL* URL = [NSURL fileURLWithPath:path];
-                    NSArray* tagArray = [theResult valueForAttribute:kMDItemUserTags];
+                    NSURL *URL = [NSURL fileURLWithPath:path];
+                    NSArray *tagArray = [theResult valueForAttribute:kMDItemUserTags];
                     
                     [self emitURL:URL tags:tagArray];
                 }
@@ -898,12 +898,12 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (NSPredicate*)formQueryPredicateForTags:(NSSet*)tagSet
+- (NSPredicate *)formQueryPredicateForTags:(NSSet *)tagSet
 {
     BOOL matchAny = [self wildcardInTagSet:tagSet];
     BOOL matchNone = [tagSet count] == 0;
 
-    NSPredicate* result;
+    NSPredicate *result;
     if (matchAny)
     {
         result = [NSPredicate predicateWithFormat:@"%K LIKE '*'", kMDItemUserTags];
@@ -918,8 +918,8 @@ typedef NS_ENUM(int, CommandCode) {
     }
     else // if tagSet count > 0
     {
-        NSMutableArray* subpredicates = [NSMutableArray new];
-        for (TagName* tag in tagSet)
+        NSMutableArray *subpredicates = [NSMutableArray new];
+        for (TagName *tag in tagSet)
             [subpredicates addObject:[NSPredicate predicateWithFormat:@"%K ==[c] %@", kMDItemUserTags, tag.visibleName]];
         result = [NSCompoundPredicate andPredicateWithSubpredicates:subpredicates];
     }
@@ -928,9 +928,9 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (NSArray*)searchScopesFromSearchScope:(SearchScope)scope
+- (NSArray *)searchScopesFromSearchScope:(SearchScope)scope
 {
-    NSMutableArray* result = [[NSMutableArray alloc] init];
+    NSMutableArray *result = [[NSMutableArray alloc] init];
 
     // Add URLs in which to explicitly search
     if ([self.URLs count])
@@ -958,10 +958,10 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (NSMetadataQuery*)performMetadataSearchForTags:(NSSet*)tagSet usageMode:(BOOL)usageMode
+- (NSMetadataQuery *)performMetadataSearchForTags:(NSSet*)tagSet usageMode:(BOOL)usageMode
 {
     // Create the metadata query
-    NSMetadataQuery* metadataQuery = [[NSMetadataQuery alloc] init];
+    NSMetadataQuery *metadataQuery = [[NSMetadataQuery alloc] init];
     
     // Register the notifications for batch and completion updates
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -1009,11 +1009,11 @@ typedef NS_ENUM(int, CommandCode) {
 }
 
 
-- (void)queryComplete:(NSNotification*)sender
+- (void)queryComplete:(NSNotification *)sender
 {
     // Stop the query, the single pass is completed.
     // This will cause our runloop loop to terminate.
-    NSMetadataQuery* metadataQuery = sender.object;
+    NSMetadataQuery *metadataQuery = sender.object;
     [metadataQuery stopQuery];
 }
 

@@ -33,7 +33,7 @@
 int main(int argc, char * const argv[])
 {
     @autoreleasepool {
-        Tag* tag = [Tag new];
+        Tag *tag = [Tag new];
         
         [tag parseCommandLineArgv:argv argc:argc];
         [tag performOperation];
